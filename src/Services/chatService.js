@@ -120,7 +120,7 @@ export function useSendConversationMessage() {
         };
 
         return fetch(
-            `${process.env.REACT_APP_API_URL}/api/messages/`,
+            `${process.env.REACT_APP_API_URL}/api/messages`,
             requestOptions
         )
             .then(handleResponse)

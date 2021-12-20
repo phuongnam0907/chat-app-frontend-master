@@ -124,21 +124,44 @@ const ChatBox = (props) => {
   };
 
   useEffect(scrollToBottom, [messages]);
-
+  
   const handleSubmit = (e) => {
     e.preventDefault();
     if (props.scope === "Global Chat") {
       sendGlobalMessage(newMessage).then(() => {
-        window.location.reload();
+        reloadMessages();
         setNewMessage("");
       });
     } else {
       sendConversationMessage(props.user._id, newMessage).then((res) => {
-        window.location.reload();
+        reloadMessages();
         setNewMessage("");
       });
     }
   };
+
+  let globalOldMess;
+  let privateOldMess;
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (props.scope === "Global Chat") {
+        getGlobalMessages().then((res) => {
+          if (res !== globalOldMess) {
+            globalOldMess = res;
+            setMessages(res);
+          }
+        });
+      } else if (props.scope !== null && props.conversationId !== null) {
+        getConversationMessages(props.user._id).then((res) => {
+          if (res !== privateOldMess) {
+            privateOldMess = res;
+            setMessages(res);
+          }
+        });
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <Grid container className={classes.root}>
